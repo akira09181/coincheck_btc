@@ -17,7 +17,27 @@ def lambda_handler(event, context):
     apikey = response['Parameters'][0]['Value']
     apisecret = response['Parameters'][1]['Value']
     coincheck = ccxt.coincheck({'apiKey': apikey, 'secret': apisecret})
-    print(coincheck.fetch_ticker(symbol='BTC/JPY'))
+    ticker = coincheck.fetch_ticker(symbol='BTC/JPY')
+    last = float(ticker['info']['last'])*0.97
+    buy = int(last*0.97)
+    sell = int(last*1.03)
+    print(ticker['info']['last'])
+    balance = coincheck.fetchBalance()
+    print(balance['info']['jpy'])
+    order = coincheck.create_order(
+        symbol='BTC/JPY',
+        type='limit',
+        side='buy',
+        amount=0.00004,
+        price=buy,
+    )
+    order2 = coincheck.create_order(
+        symbol='BTC/JPY',
+        type='limit',
+        side='sell',
+        amount=0.0039,
+        price=sell,
+    )
     return {
         "statusCode": 200,
         "body": json.dumps({
